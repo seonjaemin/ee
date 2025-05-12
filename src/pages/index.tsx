@@ -36,9 +36,9 @@ export default function Home() {
           />
           <ol>
             <li>
-              지금 계신 곳은 민선재 <code>src/pages/index.tsx</code> 입니다.
+              지금 계신 곳은 민선재 <code>src/pages/index.tsx</code> 민선재입니다.
             </li>
-            <li>초기 환경 구축 완료했습니다. 호호호</li>
+            <li>초기 환경 구축 완료했습니다. 호호호민선재 민선재 민선재</li>
           </ol>
 
           <div className={styles.ctas}>
