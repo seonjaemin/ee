@@ -12,7 +12,7 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: SSH into EC2 and run Docker container
+      - name: SSH into EC2 and setup Docker
         uses: appleboy/ssh-action@v1.0.3
         with:
           host: ${{ secrets.EC2_HOST }}
@@ -28,12 +28,15 @@ jobs:
             # 현재 사용자를 docker 그룹에 추가
             sudo usermod -aG docker $USER
 
+      - name: SSH into EC2 and run Docker container
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USER }}
+          key: ${{ secrets.EC2_PRIVATE_KEY }}
+          script: |
             # 그룹 변경 적용 (또는 EC2 서버에 재접속)
             newgrp docker
 
-            # 도커 실행
-            docker pull seaproject/my-app:latest
-            docker stop my-app || true
-            docker rm my-app || true
-            docker run -d --name my-app -p 3000:3000 seaproject/my-app:latest
-            docker system prune -a -f
+            # 애플리케이션 실행 스크립트 실행
+            /home/ubuntu/run_app.sh
