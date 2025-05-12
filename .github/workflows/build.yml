@@ -33,7 +33,7 @@ jobs:
           source: .next,public,package.json,package-lock.json
           target: /var/www/my-app/
 
-      - name: EC2에서 실행zz
+      - name: EC2에서 실행zz (pm2 사용)
         uses: appleboy/ssh-action@v1.0.3
         with:
           host: ${{ secrets.EC2_HOST }}
@@ -42,4 +42,7 @@ jobs:
           script: |
             cd /var/www/my-app
             npm install
-            npm start
+            sudo npm install -g pm2 # pm2 전역 설치 (이미 설치되어 있다면 건너뛰어짐)
+            pm2 start npm --name "your-app" -- start # npm start 명령어 실행 및 "your-app" 이름으로 pm2에 등록
+            pm2 save # 현재 실행 중인 프로세스 목록 저장 (서버 재부팅 시 자동 실행)
+            sudo pm2 startup systemd -u ${{ secrets.EC2_USER }} --hp /home/${{ secrets.EC2_USER }} # 서버 부팅 시 pm2 자동 시작 설정
