@@ -3,7 +3,7 @@ name: Docker Publish  # 워크플로우의 이름: Docker Publish
 on:  # 워크플로우를 트리거하는 이벤트 정의
   push:  # push 이벤트가 발생했을 때
     branches:  # 특정 브랜치에 push될 때만 실행
-      - minseonjae   # minseonjae 브랜치에 푸시될 때 워크플로우 실행 
+      - main   # minseonjae 브랜치에 푸시될 때 워크플로우 실행 
 
 jobs:  # 워크플로우를 구성하는 작업(job) 정의
   build-and-push:  # 작업 이름: build-and-push
