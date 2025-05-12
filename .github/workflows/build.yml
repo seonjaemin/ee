@@ -35,7 +35,7 @@ jobs:
           username: ${{ secrets.EC2_USER }}
           key: ${{ secrets.EC2_PRIVATE_KEY }}
           script: |
-            # 그룹 변경 적용 (또는 EC2 서버에 재접속)
+            # 그룹 변경 적용 (또는 EC2 서버에 재접속)11s
             newgrp docker
 
             # 애플리케이션 실행 스크립트 실행
