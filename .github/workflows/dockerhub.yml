@@ -24,4 +24,4 @@ jobs:  # 워크플로우를 구성하는 작업(job) 정의
 
       - name: Docker 이미지 푸시  # 단계 이름: Docker 이미지 푸시
         run: docker push seaproject/my-app:latest  # 빌드한 이미지를 Docker Hub에 푸시
-        # seaproject/my-app:latest 이미지를 Docker Hub로 업로드
+        # seaproject/my-app:latest 이미지를 Docker Hub로 업로드11
