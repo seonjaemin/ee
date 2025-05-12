@@ -1,27 +1,26 @@
-name: Docker Publish  # 워크플로우의 이름: Docker Publish
+name: Docker Publish
 
-on:  # 워크플로우를 트리거하는 이벤트 정의
-  push:  # push 이벤트가 발생했을 때
-    branches:  # 특정 브랜치에 push될 때만 실행
-      - main   # minseonjae 브랜치에 푸시될 때 워크플로우 실행 
+on:
+  push:
+    branches:
+      - main
 
-jobs:  # 워크플로우를 구성하는 작업(job) 정의
-  build-and-push:  # 작업 이름: build-and-push
-    runs-on: ubuntu-latest  # 작업을 실행할 환경: 최신 버전의 Ubuntu
-    steps:  # 작업 내에서 실행할 단계(step) 정의
-      - uses: actions/checkout@v3  # GitHub Actions에서 제공하는 checkout 액션 사용, v3 버전
-      - name: Docker 이미지 빌드  # 단계 이름: Docker 이미지 빌드
-        run: docker build -t seaproject/my-app:latest .  # Docker 명령어를 직접 실행하여 이미지 빌드
-        # -t: 이미지 이름과 태그를 지정 (seaproject/my-app:latest)
-        # .: 현재 디렉토리를 빌드 컨텍스트로 사용
-        # "my-app"을 실제 프로젝트 이름에 맞게 변경해야 함
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4  # v4로 업데이트
+      - name: Docker 이미지 빌드
+        run: docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/my-app:${{ github.sha }} .  # 태그에 커밋 SHA 사용
 
-      - name: Docker Hub에 로그인  # 단계 이름: Docker Hub에 로그인
-        uses: docker/login-action@v2  # Docker에서 제공하는 login 액션 사용, v2 버전
-        with:  # login 액션에 필요한 인자 전달
-          username: ${{ secrets.DOCKERHUB_USERNAME }}  # Docker Hub 사용자 이름
-          password: ${{ secrets.DOCKERHUB_PASSWORD }}  # Docker Hub 비밀번호
+      - name: Docker Hub에 로그인
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_PASSWORD }}
 
-      - name: Docker 이미지 푸시  # 단계 이름: Docker 이미지 푸시
-        run: docker push seaproject/my-app:latest  # 빌드한 이미지를 Docker Hub에 푸시
-        # seaproject/my-app:latest 이미지를 Docker Hub로 업로드11
+      - name: Docker 이미지 푸시 (latest)
+        run: |
+          docker push ${{ secrets.DOCKERHUB_USERNAME }}/my-app:${{ github.sha }}
+          docker tag ${{ secrets.DOCKERHUB_USERNAME }}/my-app:${{ github.sha }} ${{ secrets.DOCKERHUB_USERNAME }}/my-app:latest
+          docker push ${{ secrets.DOCKERHUB_USERNAME }}/my-app:latest
