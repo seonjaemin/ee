@@ -15,8 +15,8 @@ RUN npm install
 
 
 # 나머지 애플리케이션 코드 복사
-COPY . . ## [코드 추가] 일반적으로 Docker 이미지를 빌드해서 다른 사람들이 사용하게 하려면,
-COPY package*.json ./ 뿐만 아니라 프로젝트의 모든 소스 코드를 Docker 이미지에 복사해야 한다.
+COPY . . 
+COPY package*.json ./ 
 
 
 # 애플리케이션 빌드
