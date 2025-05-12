@@ -38,5 +38,5 @@ jobs:
             # 그룹 변경 적용 (또는 EC2 서버에 재접속)
             newgrp docker
 
-            # 애플리케이션 실행 스크립트 실행11
+            # 애플리케이션 실행 스크립트 실행
             /home/ubuntu/run_app.sh
