@@ -1,4 +1,4 @@
-name: EC2 Deploy with Docker
+name: CI/CD Pipeline
 
 on:
   push:
@@ -6,12 +6,33 @@ on:
       - main
 
 jobs:
-  deploy:
+  build-image:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4  # v4로 업데이트
+      - uses: actions/checkout@v4
+      - name: Docker 이미지 빌드
+        run: docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/my-app:${{ github.sha }} .
 
+  push-image:
+    runs-on: ubuntu-latest
+    needs: build-image  # build-image 작업이 완료된 후에 실행
+    steps:
+      - name: Docker Hub에 로그인
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_PASSWORD }}
+
+      - name: Docker 이미지 푸시
+        run: |
+          docker push ${{ secrets.DOCKERHUB_USERNAME }}/my-app:${{ github.sha }}
+          docker tag ${{ secrets.DOCKERHUB_USERNAME }}/my-app:${{ github.sha }} ${{ secrets.DOCKERHUB_USERNAME }}/my-app:latest
+          docker push ${{ secrets.DOCKERHUB_USERNAME }}/my-app:latest
+
+  deploy:
+    runs-on: ubuntu-latest
+    needs: push-image  # push-image 작업이 완료된 후에 실행
+    steps:
       - name: SSH into EC2 and setup Docker
         uses: appleboy/ssh-action@v1.0.3
         with:
@@ -19,13 +40,12 @@ jobs:
           username: ${{ secrets.EC2_USER }}
           key: ${{ secrets.EC2_PRIVATE_KEY }}
           script: |
-            # Docker 설치 (이미 설치되어 있다면 이 부분은 건너뛰어짐)
             sudo apt-get update
             sudo apt-get install -y docker.io
             sudo systemctl start docker
             sudo systemctl enable docker
-            sudo usermod -aG docker $USER  # 현재 사용자를 docker 그룹에 추가
-            newgrp docker  # 그룹 변경 적용
+            sudo usermod -aG docker $USER
+            newgrp docker
 
       - name: SSH into EC2 and run Docker container
         uses: appleboy/ssh-action@v1.0.3
@@ -34,12 +54,7 @@ jobs:
           username: ${{ secrets.EC2_USER }}
           key: ${{ secrets.EC2_PRIVATE_KEY }}
           script: |
-            # 최신 이미지 pull
-            docker pull ${{ secrets.DOCKERHUB_USERNAME }}/my-app:latest  # latest 태그 사용
-            
-            # 기존 컨테이너 중지 및 삭제
-            docker stop my-container || true  # 에러 무시
-            docker rm my-container || true    # 에러 무시
-            
-            # 새 컨테이너 실행
+            docker pull ${{ secrets.DOCKERHUB_USERNAME }}/my-app:latest
+            docker stop my-container || true
+            docker rm my-container || true
             docker run -d --name my-container -p 3000:3000 ${{ secrets.DOCKERHUB_USERNAME }}/my-app:latest
