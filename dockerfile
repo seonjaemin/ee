@@ -7,8 +7,8 @@ WORKDIR /app
 # package.json과 package-lock.json을 작업 디렉토리에 복사 (분리하여 캐싱 활용)
 COPY package*.json ./
 
-# 애플리케이션 의존성 설치
-RUN npm install --omit=dev  # 프로덕션 환경에서는 devDependencies 제외
+# 애플리케이션 의존성 설치, # 프로덕션 환경에서는 devDependencies 제외
+RUN npm install --omit=dev  
 
 # 나머지 애플리케이션 코드 복사
 COPY . ./
