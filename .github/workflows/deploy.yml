@@ -33,7 +33,7 @@ jobs:
           source: .next,public,package.json,package-lock.json
           target: /var/www/my-app/
 
-      - name: EC2에서 실행
+      - name: EC2에서 실행zz
         uses: appleboy/ssh-action@v1.0.3
         with:
           host: ${{ secrets.EC2_HOST }}
